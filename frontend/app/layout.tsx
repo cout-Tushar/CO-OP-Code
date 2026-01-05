@@ -14,7 +14,7 @@ const parkinsans = Parkinsans({
 });
 
 export const metadata = {
-  title: "CodeCollab",
+  title: "Co-op Code",
   description: "Collaborative coding platform",
   icons:{
     icon: "/favicon.ico",
