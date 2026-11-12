@@ -1,20 +1,19 @@
 {
   "name": "codecolab",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Co-op Code frontend and backend command entry point",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "npm --prefix server start",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "lint": "npm --prefix frontend run lint",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "npm --prefix server test",
+    "format:check": "npm --prefix frontend run format:check && node frontend/node_modules/prettier/bin/prettier.cjs --check \"server/*.js\" \"server/lib/*.js\" \"server/routes/*.js\" \"server/test/*.js\" \"server/integration/*.js\"",
+    "test:integration": "npm --prefix server run test:integration"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "mongoose": "^8.19.2",
-    "socket.io": "^4.8.1"
-  }
+  "private": true
 }

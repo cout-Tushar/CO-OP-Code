@@ -1,10 +1,16 @@
 import { Suspense } from "react";
-import ResetPassword from "./ResetPassword";
-
+import AuthForm from "../Components/AuthForm";
+export const metadata = { title: "Reset password" };
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ResetPassword />
+    <Suspense
+      fallback={
+        <div className="empty-page" role="status">
+          Loading account…
+        </div>
+      }
+    >
+      <AuthForm mode="reset" />
     </Suspense>
   );
 }

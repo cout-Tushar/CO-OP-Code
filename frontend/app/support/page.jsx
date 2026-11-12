@@ -1,47 +1,46 @@
-"use client"
-import { motion } from "framer-motion";
-
-export default function SupportPage() {
+import Link from "next/link";
+import { Mail, BookOpen, Bug } from "lucide-react";
+import ContentPage from "../Components/ContentPage";
+export const metadata = { title: "Support" };
+export default function Support() {
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white flex flex-col items-center p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-3xl w-full bg-[#161b22] rounded-2xl shadow-2xl p-10 border border-[#30363d]"
-      >
-        <h1 className="text-4xl font-bold text-center mb-4">Support</h1>
-        <p className="text-gray-400 text-center mb-10">
-          We're here to help! Choose a support option below.
-        </p>
-
-        <div className="grid grid-cols-1 gap-6">
-          {/* Email Support */}
-          <div className="p-6 rounded-2xl bg-[#0d1117] border border-[#30363d] hover:border-blue-500 transition">
-            <h2 className="text-2xl font-semibold mb-2 text-blue-400">📩 Email Support</h2>
-            <p className="text-gray-400 mb-3">Send us your issue anytime.</p>
-        <span>tusharmishra6666@gmail.com</span>
-          </div>
-
-          
-
-          {/* FAQ */}
-          <div className="p-6 rounded-2xl bg-[#0d1117] border border-[#30363d] hover:border-blue-500 transition">
-            <h2 className="text-2xl font-semibold mb-2 text-blue-400">📘 FAQs</h2>
-            <p className="text-gray-400 mb-3">Find quick answers to common questions.</p>
-            <a href="/faq" className="text-blue-500 underline hover:text-blue-400">
-              Visit FAQ Page
-            </a>
-          </div>
-
-          {/* Report Bug */}
-          <div className="p-6 rounded-2xl bg-[#0d1117] border border-[#30363d] hover:border-blue-500 transition">
-            <h2 className="text-2xl font-semibold mb-2 text-blue-400">🐛 Report a Bug</h2>
-            <p className="text-gray-400 mb-3">Found a bug? Tell us so we can fix it quickly.</p>
-           <span>tusharmishra6666@gmail.com</span>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+    <ContentPage
+      title="Let’s work it out."
+      description="A question, a rough edge, or something unexpected? Start here."
+    >
+      <div className="resource-grid">
+        <section className="resource-card">
+          <Mail size={24} />
+          <h2>Get in touch</h2>
+          <p>Tell us what you need help with.</p>
+          <a href="mailto:tusharmishra6666@gmail.com">
+            tusharmishra6666@gmail.com ↗
+          </a>
+        </section>
+        <section className="resource-card">
+          <BookOpen size={24} />
+          <h2>Find an answer</h2>
+          <p>Get familiar with rooms, collaboration, and the editor.</p>
+          <Link href="/faq">Browse common questions →</Link>
+        </section>
+        <section className="resource-card">
+          <Bug size={24} />
+          <h2>Report a bug</h2>
+          <p>
+            Include what happened, steps to reproduce it, and your browser.
+            Leave out passwords, tokens, and private code.
+          </p>
+          <a href="mailto:tusharmishra6666@gmail.com?subject=Co-op%20Code%20bug%20report">
+            Send a bug report ↗
+          </a>
+        </section>
+        <section className="resource-card">
+          <BookOpen size={24} />
+          <h2>Get up to speed</h2>
+          <p>A practical guide from your first room to running code.</p>
+          <Link href="/docs">Read the documentation →</Link>
+        </section>
+      </div>
+    </ContentPage>
   );
 }

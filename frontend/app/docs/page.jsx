@@ -1,73 +1,80 @@
-
-
-import React from "react";
-import { BookOpen, Code, Server, ArrowRight } from "lucide-react";
-
-export default function DocumentationPage() {
+import Link from "next/link";
+import ContentPage from "../Components/ContentPage";
+export const metadata = { title: "Documentation" };
+export default function Documentation() {
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white px-8 py-12">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-[#58a6ff]">
-          Documentation
-        </h1>
-        <p className="text-gray-300 mb-10 text-lg">
-          Learn how to set up, use, and contribute to the platform.
+    <ContentPage
+      title="From idea to shared code."
+      description="A short guide to getting your team into the same room."
+    >
+      <section>
+        <span className="eyebrow">01 / GET STARTED</span>
+        <h2>A room of your own</h2>
+        <p>
+          <Link href="/signup">Create an account</Link> or sign in, then choose
+          Create a room on the homepage. Already invited? Paste the invite code
+          into the join field, or open the room link.
         </p>
-
-        {/* Sections */}
-        <div className="space-y-8">
-          {/* Getting Started */}
-          <section className="bg-[#161b22] p-6 rounded-2xl border border-[#30363d] shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="text-[#58a6ff]" />
-              <h2 className="text-2xl font-semibold">Getting Started</h2>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Start your journey by understanding project setup and usage.
-            </p>
-            <ul className="list-disc list-inside text-gray-300 space-y-1">
-              <li>Install dependencies</li>
-              <li>Configure environment variables</li>
-              <li>Run frontend and backend servers</li>
-            </ul>
-          </section>
-
-          {/* API Documentation */}
-          <section className="bg-[#161b22] p-6 rounded-2xl border border-[#30363d] shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <Server className="text-[#58a6ff]" />
-              <h2 className="text-2xl font-semibold">API Documentation</h2>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Learn how your backend routes work and how to access them.
-            </p>
-            <ul className="list-disc list-inside text-gray-300 space-y-1">
-              <li>User Authentication (Register / Login / Forgot Password)</li>
-              <li>MongoDB models and validation</li>
-              <li>Socket events for real-time collaboration</li>
-            </ul>
-          </section>
-
-          {/* Code Collaboration */}
-          <section className="bg-[#161b22] p-6 rounded-2xl border border-[#30363d] shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <Code className="text-[#58a6ff]" />
-              <h2 className="text-2xl font-semibold">Live Code Collaboration</h2>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Understand how real-time updates work using Socket.io.
-            </p>
-            <ul className="list-disc list-inside text-gray-300 space-y-1">
-              <li>Room creation and joining</li>
-              <li>Broadcasting code changes</li>
-              <li>Saving and syncing sessions</li>
-            </ul>
-          </section>
-
-          {/* More */}
-    
-        </div>
-      </div>
-    </div>
+      </section>
+      <section>
+        <span className="eyebrow">02 / COLLABORATE</span>
+        <h2>Bring your team along</h2>
+        <p>
+          Use Copy invite in the workspace to share your room code. Signed-in
+          collaborators can join, edit the same document, see live cursors, and
+          talk in the room chat. Anyone with the invite can access the room, so
+          share it only with people you trust.
+        </p>
+        <p>
+          Edits sync while connected and are saved to the server. Watch the
+          connection and save status before leaving. If your connection drops,
+          editing pauses until the room rejoins. Download a copy to keep a local
+          backup.
+        </p>
+      </section>
+      <section>
+        <span className="eyebrow">03 / BUILD & RUN</span>
+        <h2>Try something out</h2>
+        <p>
+          Select JavaScript, Python, C++, or Java and choose Run code. The
+          output panel shows execution results or a useful error. HTML and CSS
+          can be edited and downloaded; they do not run in the code execution
+          service.
+        </p>
+        <p>
+          Copy, download, or reset your code from the toolbar. Reset changes the
+          shared document for everyone. Chat messages belong to the current
+          session and are not stored when you leave.
+        </p>
+      </section>
+      <section>
+        <span className="eyebrow">FOR CONTRIBUTORS</span>
+        <h2>Project setup and API</h2>
+        <p>
+          The project uses Next.js, Express, Socket.IO, and MongoDB. Install
+          frontend and server dependencies, configure the example environment
+          files, and start both services. See the repository README for exact
+          commands and validation steps.
+        </p>
+        <ul>
+          <li>Authentication: register, sign in, and recover a password.</li>
+          <li>MongoDB models: user accounts and a saved document per room.</li>
+          <li>
+            Socket events: room membership, code changes, cursors, and chat.
+          </li>
+          <li>
+            Authenticated HTTP requests use a Bearer token; sockets pass the
+            same token in their authentication handshake.
+          </li>
+        </ul>
+        <Link
+          href="https://github.com/cout-Tushar/CO-OP-Code"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Explore the source ↗
+        </Link>
+      </section>
+    </ContentPage>
   );
 }

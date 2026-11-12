@@ -4,21 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
-    
+    "start": "node index.js",
+    "test": "node --test test/*.test.js",
+    "check": "node --check index.js && node --check app.js && node --check collaboration.js && node --check routes/passwordReset.js",
+    "test:integration": "node --test integration/*.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.13.1",
     "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^7.0.0",
-    "nodemon": "^3.1.11",
+    "mongoose": "^8.19.2",
     "resend": "^6.5.0",
-    "uuid": "^13.0.0"
+    "socket.io": "^4.8.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "mongodb-memory-server-core": "^11.3.0",
+    "socket.io-client": "^4.8.1"
   }
 }
