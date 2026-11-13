@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Terminal,
 } from "lucide-react";
+import { attachCursorPresence } from "@/lib/cursorPresence";
 import Codespace from "@/app/Components/Codespace";
 import { API_URL } from "@/lib/api";
 import { signOut } from "@/lib/session";
@@ -55,10 +56,9 @@ export default function RoomPage() {
   const [running, setRunning] = useState(false);
   const socketRef = useRef(null);
   const editorRef = useRef(null);
-  const monacoRef = useRef(null);
+  const [editorInstance, setEditorInstance] = useState(null);
   const timerRef = useRef(null);
-  const cursorRef = useRef(null);
-  const decorationsRef = useRef(new Map());
+
   const pendingRef = useRef(null);
   const codeRef = useRef(INITIAL_CODE);
   const runRef = useRef(null);
@@ -78,7 +78,7 @@ export default function RoomPage() {
     }
     const socket = io(API_URL, { auth: { token }, autoConnect: false });
     socketRef.current = socket;
-    const decorations = decorationsRef.current;
+
     const apply = (value) => {
       applyingRemote.current = true;
       codeRef.current = value;
@@ -135,36 +135,6 @@ export default function RoomPage() {
       setNotice(msg);
       setStatus("Save failed");
     });
-    socket.on("cursor-update", ({ username, position }) => {
-      const editor = editorRef.current;
-      const monaco = monacoRef.current;
-      if (!editor || !monaco || !position) return;
-      const previous = decorations.get(username) || [];
-      const ids = editor.deltaDecorations(previous, [
-        {
-          range: new monaco.Range(
-            position.lineNumber,
-            position.column,
-            position.lineNumber,
-            position.column,
-          ),
-          options: {
-            className: "remote-cursor",
-            after: {
-              content: username,
-              inlineClassName: "remote-cursor-label",
-            },
-            hoverMessage: { value: username },
-          },
-        },
-      ]);
-      decorations.set(username, ids);
-    });
-    socket.on("cursor-remove", ({ username }) => {
-      const ids = decorations.get(username);
-      if (ids && editorRef.current) editorRef.current.deltaDecorations(ids, []);
-      decorations.delete(username);
-    });
     const beforeUnload = (event) => {
       if (pendingRef.current !== null || inFlightRef.current) {
         event.preventDefault();
@@ -183,10 +153,10 @@ export default function RoomPage() {
     return () => {
       clearTimeout(timerRef.current);
       runRef.current?.abort();
-      cursorRef.current?.dispose();
+
       socket.disconnect();
       socketRef.current = null;
-      decorations.clear();
+
       window.removeEventListener("beforeunload", beforeUnload);
       window.removeEventListener("storage", onStorage);
     };
@@ -194,6 +164,15 @@ export default function RoomPage() {
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
   }, [messages]);
+  useEffect(() => {
+    if (!editorInstance || !socketRef.current) return;
+    return attachCursorPresence({
+      ...editorInstance,
+      socket: socketRef.current,
+      roomId,
+      isApplyingRemote: () => applyingRemote.current,
+    });
+  }, [editorInstance, roomId]);
   function save(value, revision) {
     if (value.length > 100000) {
       setNotice(
@@ -439,19 +418,7 @@ export default function RoomPage() {
               options={{ ...editorOptions, readOnly: !connected }}
               onMount={(editor, monaco) => {
                 editorRef.current = editor;
-                monacoRef.current = monaco;
-                cursorRef.current?.dispose();
-                let last = 0;
-                cursorRef.current = editor.onDidChangeCursorPosition(
-                  ({ position }) => {
-                    if (Date.now() - last < 80) return;
-                    last = Date.now();
-                    socketRef.current?.volatile.emit("cursor-move", {
-                      roomId,
-                      position,
-                    });
-                  },
-                );
+                setEditorInstance({ editor, monaco });
               }}
             />
           </div>

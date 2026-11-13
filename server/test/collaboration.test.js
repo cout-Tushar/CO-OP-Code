@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { io } from "socket.io-client";
+import jwt from "jsonwebtoken";
 import { fixture } from "./fixtures.js";
 const once = (socket, event) =>
   new Promise((resolve, reject) => {
@@ -148,4 +149,46 @@ test("leaving a room revokes event membership", async (t) => {
     (await emit(a, "code-change", { roomId: "pair", code: "bad" })).ok,
     false,
   );
+});
+
+test("cursor presence preserves identity, selections, snapshots and cleanup", async (t) => {
+  const app = await setup(t);
+  const id = "abcdefabcdefabcdefabcdef";
+  app.users.set(id, { _id: id, username: "Grace" });
+  const token = jwt.sign({ id }, app.jwtSecret, { expiresIn: "1h" });
+  const a = await app.connect();
+  const b = await app.connect(token);
+  await emit(a, "join-room", { roomId: "pair" });
+  await emit(b, "join-room", { roomId: "pair" });
+  const selection = {
+    anchor: { lineNumber: 1, column: 1 },
+    head: { lineNumber: 2, column: 3 },
+  };
+  const moved = once(a, "cursor-update");
+  b.emit("cursor-move", {
+    roomId: "pair",
+    position: selection.head,
+    selection,
+    username: "Spoof",
+  });
+  const cursor = await moved;
+  assert.equal(cursor.username, "Grace");
+  assert.equal(cursor.userId, id);
+  assert.equal(cursor.id, b.id);
+  assert.deepEqual(cursor.selection, selection);
+  const c = await app.connect();
+  const snapshot = once(c, "cursor-snapshot");
+  await emit(c, "join-room", { roomId: "pair" });
+  assert.deepEqual(await snapshot, [cursor]);
+  const removed = once(a, "cursor-remove");
+  await emit(b, "join-room", { roomId: "different" });
+  assert.deepEqual(await removed, { id: b.id, roomId: "pair" });
+  await emit(b, "join-room", { roomId: "pair" });
+  const again = once(a, "cursor-update");
+  b.emit("cursor-move", { roomId: "pair", position: selection.head });
+  assert.equal((await again).color, cursor.color);
+  const disconnected = once(a, "cursor-remove");
+  const socketId = b.id;
+  b.disconnect();
+  assert.equal((await disconnected).id, socketId);
 });

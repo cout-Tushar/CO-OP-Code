@@ -21,6 +21,11 @@ export function attachCollaboration(io, { User, Code, jwtSecret }) {
       const user = await User.findById(auth.id).select("username").lean();
       if (!user) throw new Error("Unauthorized");
       socket.data.username = user.username;
+      socket.data.userId = String(auth.id);
+      let hue = 0;
+      for (const char of String(auth.id))
+        hue = (hue * 31 + char.charCodeAt(0)) % 360;
+      socket.data.color = `hsl(${hue}, 78%, 72%)`;
       socket.data.expires = auth.exp * 1000;
       next();
     } catch {
@@ -49,9 +54,8 @@ export function attachCollaboration(io, { User, Code, jwtSecret }) {
         text: `${socket.data.username} left the room`,
         system: true,
       });
-      socket
-        .to(roomId)
-        .emit("cursor-remove", { username: socket.data.username });
+      socket.to(roomId).emit("cursor-remove", { id: socket.id, roomId });
+      socket.data.cursor = null;
       socket.leave(roomId);
       socket.data.roomId = null;
     }
@@ -81,6 +85,7 @@ export function attachCollaboration(io, { User, Code, jwtSecret }) {
             text: `${socket.data.username} joined the room`,
             system: true,
           });
+          snapshot();
           ack(callback, { ok: true });
         });
       } catch {
@@ -121,14 +126,47 @@ export function attachCollaboration(io, { User, Code, jwtSecret }) {
           });
         });
     });
+    const snapshot = () => {
+      const roomId = socket.data.roomId;
+      if (!member(roomId)) return;
+      const cursors = [...(io.sockets.adapter.rooms.get(roomId) || [])]
+        .filter((id) => id !== socket.id)
+        .map((id) => io.sockets.sockets.get(id)?.data.cursor)
+        .filter(Boolean);
+      socket.emit("cursor-snapshot", cursors);
+    };
+    socket.on("cursor-sync", snapshot);
     socket.on("cursor-move", (payload) => {
-      const { roomId, position } = payload || {};
-      if (member(roomId) && validPosition(position) && allow("event"))
-        socket.to(roomId).volatile.emit("cursor-update", {
-          username: socket.data.username,
-          color: "#b5a2ff",
-          position,
-        });
+      const { roomId, position, selection } = payload || {};
+      if (!member(roomId) || !validPosition(position) || !allow("event"))
+        return;
+      if (
+        selection &&
+        (!validPosition(selection.anchor) || !validPosition(selection.head))
+      )
+        return;
+      const cursor = {
+        id: socket.id,
+        userId: socket.data.userId,
+        roomId,
+        username: socket.data.username,
+        color: socket.data.color,
+        position: { lineNumber: position.lineNumber, column: position.column },
+        selection: selection
+          ? {
+              anchor: {
+                lineNumber: selection.anchor.lineNumber,
+                column: selection.anchor.column,
+              },
+              head: {
+                lineNumber: selection.head.lineNumber,
+                column: selection.head.column,
+              },
+            }
+          : { anchor: position, head: position },
+      };
+      socket.data.cursor = cursor;
+      socket.to(roomId).emit("cursor-update", cursor);
     });
     socket.on("chat-message", (payload, callback) => {
       const { roomId, text } = payload || {};
