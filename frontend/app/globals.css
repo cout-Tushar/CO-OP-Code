@@ -792,9 +792,18 @@ textarea::placeholder {
   }
 }
 .workspace {
-  height: 100dvh;
+  width: min(1440px, calc(100% - 32px));
+  height: min(860px, calc(100dvh - 32px));
+  min-height: 540px;
+  margin: 16px auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #b5a2ff26;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 80px #00000045,
+    0 0 48px #8958ff0c;
   background:
     radial-gradient(ellipse at 80% 0%, #8958ff18, transparent 55%), #121318;
 }
@@ -809,6 +818,7 @@ textarea::placeholder {
   letter-spacing: 0.04em;
 }
 .workspace-header {
+  flex-shrink: 0;
   min-height: 72px;
   display: flex;
   align-items: center;
@@ -843,6 +853,7 @@ textarea::placeholder {
   flex-direction: column;
 }
 .editor-toolbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -861,7 +872,8 @@ textarea::placeholder {
 }
 .editor-container {
   flex: 1;
-  min-height: 260px;
+  min-height: 0;
+  overflow: hidden;
   position: relative;
 }
 .workspace-status {
@@ -872,7 +884,8 @@ textarea::placeholder {
   color: #e3bc83;
 }
 .output-panel {
-  height: 190px;
+  height: clamp(120px, 21vh, 190px);
+  flex-shrink: 0;
   min-height: 100px;
   overflow: auto;
   border-top: 1px solid var(--border);
@@ -1178,8 +1191,12 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
   .workspace {
+    width: 100%;
     height: auto;
     min-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
   }
   .workspace-header {
     padding: 12px;
