@@ -8,6 +8,7 @@ import {
   Check,
 } from "lucide-react";
 import RoomActions from "./Components/RoomActions";
+import TypingCode from "./Components/TypingCode";
 export default function HomePage() {
   return (
     <div className="home container">
@@ -60,32 +61,7 @@ export default function HomePage() {
               <span className="js-badge">JS</span> main.js{" "}
               <span className="muted">×</span>
             </div>
-            <pre>
-              <code>
-                <span className="comment">
-                  {"// A little collaboration goes a long way."}
-                </span>
-                {"\n\n"}
-                <span className="purple">const</span> team = [
-                <span className="green">&quot;you&quot;</span>,{" "}
-                <span className="green">
-                  &quot;your next collaborator&quot;
-                </span>
-                ];{"\n\n"}
-                <span className="purple">function</span>{" "}
-                <span className="blue">buildTogether</span>(idea) {"{"}
-                {"\n"} <span className="purple">return</span> team.
-                <span className="blue">map</span>(developer =&gt; {"{"}
-                {"\n"} <span className="purple">return</span> developer +{" "}
-                <span className="green">&quot; + &quot;</span> + idea;{"\n"}{" "}
-                {"}"});{"\n"}
-                {"}"}
-                {"\n\n"}
-                <span className="blue">buildTogether</span>(
-                <span className="green">&quot;something great&quot;</span>);
-                <span className="sample-cursor" aria-hidden="true" />
-              </code>
-            </pre>
+            <TypingCode />
             <div className="preview-status">
               <span>
                 <GitBranch size={13} /> shared session

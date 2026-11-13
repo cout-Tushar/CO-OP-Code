@@ -19,7 +19,9 @@ Configure `server/.env` before starting:
 - `JWT_SECRET`: a cryptographically random secret of at least 32 characters. Existing deployments must retain their secure secret to keep issued tokens valid; no secret was changed by this refactor.
 - `FRONTEND_URL`: allowed frontend origin, normally `http://localhost:3000`. A comma-separated list is supported; the first origin is used in reset emails. Required in production.
 - `RESEND_API_KEY` and `RESEND_FROM`: email provider key and verified sending address. Without them, email recovery cannot deliver mail.
-- `PISTON_API_URL` and optional `PISTON_API_KEY`: a usable Piston execution endpoint and its Bearer credential. Public service access is not assumed.
+- `JUDGE0_API_URL`: base URL of a reachable [Judge0 CE instance](https://ce.judge0.com/docs), without `/submissions`. Use a separate runner host for production. If the instance requires an `X-Auth-Token`, set `JUDGE0_API_KEY` on the Express backend.
+- For a live smoke test, set `JUDGE0_API_URL=https://ce.judge0.com` and restart the backend. Code submitted with Run is sent to the configured instance. In Java, use `public class Main` with a `main` method.
+- Your `*.vercel.app` URL can be the reset link destination in `FRONTEND_URL`. Set `RESEND_FROM` to an address on a domain you control and verify in Resend for general delivery. The default `onboarding@resend.dev` sender is for testing with your Resend account email.
 - `PORT`: defaults to 5000.
 
 In `frontend/.env.local`, `NEXT_PUBLIC_API_URL` is the browser-reachable backend origin. `API_URL` is the backend origin used by the Next.js execution proxy. The defaults are `http://localhost:5000`. Public environment variables are embedded at build time; rebuild when changing them.
@@ -76,7 +78,7 @@ Monaco is loaded only inside a room and bundled locally with its language worker
 
 ## Deployment limits
 
-Read [IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md) before release. This change does not deploy the application or alter infrastructure/secrets. Production rollout requires configured MongoDB, Resend and Piston smoke tests, HTTPS/reverse-proxy verification, and an explicit capacity/security review for the deployment topology.
+Read [IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md) before release. Production rollout requires configured MongoDB, Resend and Judge0 smoke tests, HTTPS/reverse-proxy verification, and a capacity and security review for the deployment topology.
 
 The existing whole-document collaboration protocol is retained; concurrent edits are not merged by a CRDT/OT engine. Rate-limit counters and save queues are per process. Multi-instance operation needs coordinated room state, ordering and shared limiting. Keep a single backend instance until that work is designed and tested. Do not enable broad proxy trust; configure only verified proxy hops at the deployment boundary if needed.
 

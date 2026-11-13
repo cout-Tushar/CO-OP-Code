@@ -220,8 +220,11 @@ test("execution is authorized, validated and forwards bounded runner configurati
   const result = await app.request("/api/execute", body, app.token);
   assert.equal(result.data.output, "42\n");
   const sent = JSON.parse(app.executions[0].options.body);
-  assert.equal(sent.version, "*");
-  assert.equal(sent.run_timeout, 3000);
+  assert.equal(sent.language_id, 63);
+  assert.equal(Buffer.from(sent.source_code, "base64").toString(), body.code);
+  assert.equal(sent.cpu_time_limit, 3);
+  assert.equal(sent.enable_network, false);
+  assert.match(app.executions[2].url, /\/submissions\/test-submission\?/);
 });
 test("execution provider errors do not expose upstream internals", async (t) => {
   const app = await setup(t, {

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   },
   description:
     "A shared space to edit, run, and discuss code together in your browser.",
+  icons: { icon: "/icon.svg", shortcut: "/icon.svg" },
 };
 export default function RootLayout({
   children,

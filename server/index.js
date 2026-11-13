@@ -16,8 +16,8 @@ async function start() {
     Code,
     jwtSecret: process.env.JWT_SECRET,
     frontendUrl: process.env.FRONTEND_URL,
-    pistonUrl: process.env.PISTON_API_URL,
-    pistonKey: process.env.PISTON_API_KEY,
+    judge0Url: process.env.JUDGE0_API_URL,
+    judge0Key: process.env.JUDGE0_API_KEY,
     sendMail: async (message) => {
       if (!resend) throw new Error("Email is not configured.");
       const result = await resend.emails.send({

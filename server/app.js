@@ -7,12 +7,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passwordResetRoutes from "./routes/passwordReset.js";
 import { authenticate, rateLimit } from "./lib/security.js";
+import { judge0Languages, runJudge0 } from "./lib/judge0.js";
 import {
   validEmail,
   validPassword,
   validUsername,
   validCode,
-  executableLanguages,
 } from "./lib/validation.js";
 import { attachCollaboration } from "./collaboration.js";
 const dummyPasswordHash = bcrypt.hashSync("invalid-account-password", 12);
@@ -24,8 +24,8 @@ export function createApplication({
   frontendUrl = "http://localhost:3000",
   sendMail,
   executeFetch = fetch,
-  pistonUrl = "https://emkc.org/api/v2/piston/execute",
-  pistonKey,
+  judge0Url,
+  judge0Key,
 }) {
   if (!jwtSecret || jwtSecret.length < 32)
     throw new Error("JWT_SECRET must contain at least 32 characters.");
@@ -131,45 +131,20 @@ export function createApplication({
     rateLimit({ limit: 10, windowMs: 60000 }),
     async (req, res) => {
       const { language, code } = req.body || {};
-      if (
-        !executableLanguages.has(language) ||
-        !validCode(code) ||
-        !code.trim()
-      )
+      if (!judge0Languages.has(language) || !validCode(code) || !code.trim())
         return res.status(400).json({
           output:
             "Choose JavaScript, Python, C++, or Java and provide 1–100,000 characters of code.",
         });
       try {
-        const response = await executeFetch(pistonUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(pistonKey ? { Authorization: `Bearer ${pistonKey}` } : {}),
-          },
-          body: JSON.stringify({
-            language,
-            version: "*",
-            files: [{ name: "main", content: code }],
-            compile_timeout: 10000,
-            run_timeout: 3000,
-            run_memory_limit: 128000000,
-          }),
-          signal: AbortSignal.timeout(15000),
+        const output = await runJudge0({
+          apiUrl: judge0Url,
+          apiKey: judge0Key,
+          fetchRunner: executeFetch,
+          language,
+          code,
         });
-        if (!response.ok)
-          return res.status(502).json({
-            output: "The code runner is unavailable. Please try again later.",
-          });
-        const result = await response.json();
-        res.json({
-          output: String(
-            result.run?.output ||
-              result.compile?.output ||
-              result.message ||
-              "Execution finished without output.",
-          ).slice(0, 100000),
-        });
+        res.json({ output });
       } catch {
         res.status(502).json({
           output: "The code runner could not respond. Please try again.",

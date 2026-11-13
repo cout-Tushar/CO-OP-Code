@@ -23,9 +23,3 @@ export const validPosition = (value) =>
   value.column > 0 &&
   value.lineNumber <= 100001 &&
   value.column <= 100001;
-export const executableLanguages = new Set([
-  "javascript",
-  "python",
-  "cpp",
-  "java",
-]);

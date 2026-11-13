@@ -535,6 +535,7 @@ export default function RoomPage() {
           </form>
         </aside>
       </div>
+      <div className="workspace-signature">co-op / code</div>
     </div>
   );
 }

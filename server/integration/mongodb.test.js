@@ -319,7 +319,7 @@ test("real MongoDB integration", { timeout: 300000 }, async (t) => {
           NODE_ENV: "production",
           FRONTEND_URL: "http://localhost:3000",
           RESEND_API_KEY: "",
-          PISTON_API_KEY: "",
+          JUDGE0_API_KEY: "",
         },
         windowsHide: true,
         stdio: "ignore",

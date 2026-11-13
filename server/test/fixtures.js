@@ -70,11 +70,13 @@ export async function fixture(overrides = {}) {
     sendMail: async (mail) => {
       mails.push(mail);
     },
+    judge0Url: "http://judge0.test",
     executeFetch: async (url, options) => {
       executions.push({ url, options });
-      return new Response(JSON.stringify({ run: { output: "42\n" } }), {
-        status: 200,
-      });
+      if (options.method === "POST")
+        return Response.json({ token: "test-submission" }, { status: 201 });
+      if (executions.length === 2) return Response.json({ status: { id: 2 } });
+      return Response.json({ status: { id: 3 }, stdout: "NDIK" });
     },
     ...overrides,
   };
